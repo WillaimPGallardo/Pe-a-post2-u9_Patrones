@@ -2,13 +2,17 @@ package com.universidad.productos_service.service;
 
 import com.universidad.productos_service.domain.Producto;
 
+import java.util.List;
+
 public interface ProductoService {
 
-    Producto crear(String nombre, Double precio, Integer stock);
+    List<Producto> listarProductos();
 
-    Producto buscarPorId(Long id);
+    Producto guardarProducto(Producto producto);
 
-    Producto actualizarStock(Long id, Integer nuevoStock);
+    Producto buscarProductoPorId(Long id);
 
-    void eliminar(Long id);
+    Producto actualizarProducto(Long id, Producto producto);
+
+    void eliminarProducto(Long id);
 }

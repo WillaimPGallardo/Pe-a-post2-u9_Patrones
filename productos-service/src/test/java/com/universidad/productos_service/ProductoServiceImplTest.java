@@ -4,169 +4,102 @@ import com.universidad.productos_service.domain.Producto;
 import com.universidad.productos_service.repository.ProductoRepository;
 import com.universidad.productos_service.service.ProductoServiceImpl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import org.mockito.junit.jupiter.MockitoExtension;
-
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-public class ProductoServiceImplTest {
+class ProductoServiceImplTest {
 
     @Mock
     private ProductoRepository productoRepository;
 
     @InjectMocks
-    private ProductoServiceImpl producto_Service;
+    private ProductoServiceImpl productoService;
+
+    private Producto producto;
+
+    @BeforeEach
+    void setUp() {
+
+        MockitoAnnotations.openMocks(this);
+
+        producto = new Producto(
+                1L,
+                "Laptop",
+                1500.0,
+                10
+        );
+    }
 
     @Test
-    void crearProductoCorrectamente() {
+    void listarProductos_retornaLista() {
 
-        Producto producto =
-                new Producto(
-                        1L,
-                        "Laptop",
-                        1500.0,
-                        10
-                );
+        when(productoRepository.findAll())
+                .thenReturn(List.of(producto));
 
-        when(productoRepository.save(any(Producto.class)))
+        List<Producto> productos =
+                productoService.listarProductos();
+
+        assertEquals(1, productos.size());
+
+        verify(productoRepository, times(1))
+                .findAll();
+    }
+
+    @Test
+    void guardarProducto_retornaProductoGuardado() {
+
+        when(productoRepository.save(producto))
                 .thenReturn(producto);
 
         Producto resultado =
-                producto_Service.crear(
-                        "Laptop",
-                        1500.0,
-                        10
-                );
+                productoService.guardarProducto(producto);
 
         assertNotNull(resultado);
 
-        assertEquals(
-                "Laptop",
-                resultado.getNombre()
-        );
+        assertEquals("Laptop", resultado.getNombre());
 
-        verify(productoRepository)
-                .save(any(Producto.class));
+        verify(productoRepository, times(1))
+                .save(producto);
     }
 
     @Test
-    void crearProductoConNombreVacio() {
-
-        Exception exception =
-                assertThrows(
-                        IllegalArgumentException.class,
-                        () -> {
-                            producto_Service.crear(
-                                    "",
-                                    100.0,
-                                    5
-                            );
-                        }
-                );
-
-        assertEquals(
-                "El nombre no puede estar vacío",
-                exception.getMessage()
-        );
-    }
-
-    @Test
-    void buscarProductoExistente() {
-
-        Producto producto =
-                new Producto(
-                        1L,
-                        "Mouse",
-                        50.0,
-                        20
-                );
+    void buscarProductoPorId_existente_retornaProducto() {
 
         when(productoRepository.findById(1L))
                 .thenReturn(Optional.of(producto));
 
         Producto resultado =
-                producto_Service.buscarPorId(1L);
+                productoService.buscarProductoPorId(1L);
 
-        assertEquals(
-                "Mouse",
-                resultado.getNombre()
-        );
+        assertNotNull(resultado);
+
+        assertEquals(1L, resultado.getId());
+
+        verify(productoRepository, times(1))
+                .findById(1L);
     }
 
     @Test
-    void buscarProductoNoExistente() {
-
-        when(productoRepository.findById(99L))
-                .thenReturn(Optional.empty());
-
-        assertThrows(
-                RuntimeException.class,
-                () -> {
-                    producto_Service.buscarPorId(99L);
-                }
-        );
-    }
-
-    @Test
-    void actualizarStockCorrectamente() {
-
-        Producto producto =
-                new Producto(
-                        1L,
-                        "Teclado",
-                        80.0,
-                        10
-                );
-
-        when(productoRepository.findById(1L))
-                .thenReturn(Optional.of(producto));
-
-        when(productoRepository.save(any(Producto.class)))
-                .thenReturn(producto);
-
-        Producto actualizado =
-                producto_Service.actualizarStock(
-                        1L,
-                        25
-                );
-
-        assertEquals(
-                25,
-                actualizado.getStock()
-        );
-    }
-
-    @Test
-    void eliminarProducto() {
-
-        Producto producto =
-                new Producto(
-                        1L,
-                        "Monitor",
-                        900.0,
-                        5
-                );
-
-        when(productoRepository.findById(1L))
-                .thenReturn(Optional.of(producto));
+    void eliminarProducto_llamaRepository() {
 
         doNothing()
                 .when(productoRepository)
                 .deleteById(1L);
 
-        producto_Service.eliminar(1L);
+        productoService.eliminarProducto(1L);
 
-        verify(productoRepository)
+        verify(productoRepository, times(1))
                 .deleteById(1L);
     }
 }

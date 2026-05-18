@@ -2,69 +2,53 @@ package com.universidad.productos_service.service;
 
 import com.universidad.productos_service.domain.Producto;
 import com.universidad.productos_service.repository.ProductoRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ProductoServiceImpl implements ProductoService {
 
-    private final ProductoRepository productoRepository;
+    @Autowired
+    private ProductoRepository productoRepository;
 
-    public ProductoServiceImpl(ProductoRepository productoRepository) {
-        this.productoRepository = productoRepository;
+    @Override
+    public List<Producto> listarProductos() {
+        return productoRepository.findAll();
     }
 
     @Override
-    public Producto crear(String nombre, Double precio, Integer stock) {
-
-        if (nombre == null || nombre.isBlank()) {
-            throw new IllegalArgumentException("El nombre no puede estar vacío");
-        }
-
-        if (precio == null || precio <= 0) {
-            throw new IllegalArgumentException("El precio debe ser mayor a cero");
-        }
-
-        if (stock == null || stock < 0) {
-            throw new IllegalArgumentException("El stock no puede ser negativo");
-        }
-
-        Producto producto = new Producto(
-                null,
-                nombre.strip(),
-                precio,
-                stock
-        );
-
+    public Producto guardarProducto(Producto producto) {
         return productoRepository.save(producto);
     }
 
     @Override
-    public Producto buscarPorId(Long id) {
-
+    public Producto buscarProductoPorId(Long id) {
         return productoRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Producto no encontrado: " + id));
+                .orElse(null);
     }
 
     @Override
-    public Producto actualizarStock(Long id, Integer nuevoStock) {
+    public Producto actualizarProducto(Long id, Producto producto) {
 
-        if (nuevoStock < 0) {
-            throw new IllegalArgumentException("El stock no puede ser negativo");
+        Producto existente = productoRepository.findById(id)
+                .orElse(null);
+
+        if (existente != null) {
+            existente.setNombre(producto.getNombre());
+            existente.setPrecio(producto.getPrecio());
+            existente.setStock(producto.getStock());
+
+            return productoRepository.save(existente);
         }
 
-        Producto producto = buscarPorId(id);
-
-        producto.setStock(nuevoStock);
-
-        return productoRepository.save(producto);
+        return null;
     }
 
     @Override
-    public void eliminar(Long id) {
-
-        buscarPorId(id);
-
+    public void eliminarProducto(Long id) {
         productoRepository.deleteById(id);
     }
 }

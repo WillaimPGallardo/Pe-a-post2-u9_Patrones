@@ -2,31 +2,59 @@ package com.universidad.productos_service.controller;
 
 import com.universidad.productos_service.domain.Producto;
 import com.universidad.productos_service.service.ProductoService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/productos")
+@RequestMapping("/api/productos")
 public class ProductoController {
 
-    private final ProductoService productoService;
+    @Autowired
+    private ProductoService productoService;
 
-    public ProductoController(ProductoService productoService) {
-        this.productoService = productoService;
+    @GetMapping
+    public List<Producto> listarProductos() {
+        return productoService.listarProductos();
     }
 
     @PostMapping
-    public Producto crear(@RequestBody Producto producto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Producto crearProducto(
+            @RequestBody Producto producto
+    ) {
 
-        return productoService.crear(
-                producto.getNombre(),
-                producto.getPrecio(),
-                producto.getStock()
-        );
+        return productoService.guardarProducto(producto);
     }
 
     @GetMapping("/{id}")
-    public Producto buscar(@PathVariable Long id) {
+    public Producto buscarProducto(
+            @PathVariable Long id
+    ) {
 
-        return productoService.buscarPorId(id);
+        return productoService.buscarProductoPorId(id);
+    }
+
+    @PutMapping("/{id}")
+    public Producto actualizarProducto(
+            @PathVariable Long id,
+            @RequestBody Producto producto
+    ) {
+
+        return productoService.actualizarProducto(
+                id,
+                producto
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public void eliminarProducto(
+            @PathVariable Long id
+    ) {
+
+        productoService.eliminarProducto(id);
     }
 }
