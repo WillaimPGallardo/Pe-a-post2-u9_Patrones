@@ -18,36 +18,8 @@ MockMvc
 JaCoCo
 GitHub Actions
 Visual Studio Code
-Estructura del Proyecto
-productos-service
-│
-├── .github
-│   └── workflows
-│       └── ci.yml
-│
-├── src
-│   ├── main
-│   │   ├── java/com/universidad/productos_service
-│   │   │
-│   │   ├── controller
-│   │   ├── domain
-│   │   ├── exception
-│   │   ├── repository
-│   │   ├── service
-│   │   └── ProductosServiceApplication.java
-│   │
-│   └── resources
-│       └── application.properties
-│
-├── src/test
-│   ├── controller
-│   ├── repository
-│   ├── service
-│   └── resources
-│
-├── pom.xml
-└── README.md
-Funcionalidades Implementadas
+
+
 
 El sistema permite:
 
